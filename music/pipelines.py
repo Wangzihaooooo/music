@@ -37,8 +37,9 @@ class save_to_mysql(object):
             if type(item) == MusicItem:
                 try:
                     if (item['song_id'] != None and item['song_title'] != None and item['song_dir'] != None and item['song_tag'] != None):
-                        sql = 'insert into ' + 'spider_music' + '(SONG_ID_,SINGER_ID_,ALBUM_ID_) values(%s,%s,%s);'
-                        self.cursor.execute(sql, (int(item['song_id']), int(item['singer_id']), int(item['album_id'])))
+                        sql = 'insert into ' + 'spider_music' + '(SONG_ID_,SINGER_ID_,ALBUM_ID_) select %s,%s,%s from dual where not exists' \
+                                                                 '(select * from spider_music where SONG_ID_=%s)'
+                        self.cursor.execute(sql, (int(item['song_id']), int(item['singer_id']), int(item['album_id']),int(item['song_id'])))
 
                         sql = 'insert into ' + 'spider_song' + '(SONG_ID_,SONG_TITLE_,SONG_PIC_,SONG_DIR_) select %s,%s,%s,%s from dual where not exists' \
                                                                '(select * from spider_song where SONG_ID_=%s)'
@@ -47,8 +48,6 @@ class save_to_mysql(object):
                         sql = 'insert into ' + 'recg_tag_relation' + '(TAG_ID_,SONG_ID_) values(%s,%s);'
                         self.cursor.execute(sql, (int(item['song_tag']), int(item['song_id'])))
 
-                        sql = 'update ' + 'recg_tag ' + 'set SONG_SUM_=SONG_SUM_+1 where TAG_ID_=%s'
-                        self.cursor.execute(sql, int(item['song_tag']))
                 except Exception as e:
                     print e
                     print u'---------------song的数据错误,' + item['song_id'] + u'插入失败----------------------'
