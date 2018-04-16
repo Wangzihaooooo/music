@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import urllib
 import scrapy
 import json
-import urllib2
 import os
-
+from urllib import request
 from scrapy import FormRequest
 from scrapy.utils.project import get_project_settings
 from music.items import MusicItem
@@ -13,7 +11,7 @@ class MusicspiderSpider(scrapy.Spider):
     name = 'musicSpider'
     tagDict={
         '轻松':0,'舒服':0,'轻音乐':0,
-        '励志':1,'美好':1,'美好':1,
+        '励志':1,'美好':1,
         '激情':2, '劲爆':2,
         '寂寞':3,'想念':3,'伤感':3,'深情':3
     }
@@ -55,8 +53,8 @@ class MusicspiderSpider(scrapy.Spider):
                                       meta={'item': item},
                                       callback=self.song_parse)
             except Exception as e:
-                print e
-                print '爬取list出现错误'
+                print (e)
+                print ('爬取list出现错误')
 
         tag=response.meta["tag"]
         page=int(response.meta["page"]+1)
@@ -87,17 +85,17 @@ class MusicspiderSpider(scrapy.Spider):
         item["song_dir"] = songDir
         item["song_pic"] = songPic
         try:
-            f = urllib2.urlopen(songlink)
+            f = request.urlopen(songlink)
             if not os.path.isfile(songDir):
                 with open(songDir, "wb") as code:
                     code.write(f.read())
                 yield item
             else:
-                print "%s      is already downloaded." % item['song_title']
+                print ("%s      is already downloaded." % item['song_title'])
                 return
         except Exception as e:
-            print e
-            print item['song_id'].encode('utf-8')+u'下载失败'
+            print (e)
+            print (item['song_id'].encode('utf-8')+u'下载失败')
             return
 
 

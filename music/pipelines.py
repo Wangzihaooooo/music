@@ -4,7 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import MySQLdb
+import pymysql
 from music.items import MusicItem
 
 class save_to_mysql(object):
@@ -26,7 +26,7 @@ class save_to_mysql(object):
 
 
     def open_spider(self,spider):
-        self.db = MySQLdb.connect(host=self.host,port=self.port,user=self.username,passwd=self.password,db=self.db_name,charset='utf8')
+        self.db = pymysql.connect(host=self.host,port=self.port,user=self.username,passwd=self.password,db=self.db_name,charset='utf8')
         self.cursor = self.db.cursor()
 
     def close_spider(self,spider):
@@ -49,8 +49,8 @@ class save_to_mysql(object):
                         self.cursor.execute(sql, (int(item['song_tag']), int(item['song_id'])))
 
                 except Exception as e:
-                    print e
-                    print u'---------------song的数据错误,' + item['song_id'] + u'插入失败----------------------'
+                    print (e)
+                    print (u'---------------song的数据错误,' + item['song_id'] + u'插入失败----------------------')
                     return
 
 
@@ -60,8 +60,8 @@ class save_to_mysql(object):
                                                                  '(select * from spider_singer where SINGER_ID_=%s)'
                         self.cursor.execute(sql, (int(item['singer_id']), item['singer_name'], int(item['singer_id'])))
                 except Exception as e:
-                    print e
-                    print u'---------------spider_singer数据库插入错误,' + item['song_id'] + u'插入失败----------------------'
+                    print (e)
+                    print (u'---------------spider_singer数据库插入错误,' + item['song_id'] + u'插入失败----------------------')
                     return
 
                 try:
@@ -70,14 +70,14 @@ class save_to_mysql(object):
                                                                  '(select * from spider_album where ALBUM_ID_=%s)'
                         self.cursor.execute(sql, (int(item['album_id']), item['album_title'],int(item['album_id'])))
                 except Exception as e:
-                    print e
-                    print u'---------------spider_album数据库插入错误,' + item['song_id'] + u'插入失败----------------------'
+                    print (e)
+                    print (u'---------------spider_album数据库插入错误,' + item['song_id'] + u'插入失败----------------------')
                     return
 
                 self.db.commit()
         except Exception as e:
-            print e
-            print u'---------------数据库插入错误,'+item['song_id']+u'插入失败----------------------'
+            print (e)
+            print (u'---------------数据库插入错误,'+item['song_id']+u'插入失败----------------------')
             return
         pass
         return item
